@@ -1,37 +1,30 @@
+import 'package:flutter_todo/app/interactor/repositories/todo_repository.dart';
+
+import '../../injector.dart';
 import '../atoms/todo_atom.dart';
 import '../models/todo_model.dart';
 
-var _autoIncrement = 4;
-
 Future<void> fetchTodos() async {
-  // Mockup implementation
-  todoState.value = [
-    TodoModel(id: 1, title: 'Test 1', check: true),
-    TodoModel(id: 2, title: 'Test 2', check: false),
-    TodoModel(id: 3, title: 'Test 3', check: true),
-    TodoModel(id: 4, title: 'Test 4', check: false),
-  ];
+  final repository = injector.get<TodoRepository>();
+  todoState.value = await repository.getAll();
 }
 
-// create or update
 Future<void> putTodo(TodoModel model) async {
+  final repository = injector.get<TodoRepository>();
   if (model.id == -1) {
-    // create
-    _autoIncrement++;
-    todoState.value = [
-      ...todoState.value,
-      model.copyWith(
-        id: _autoIncrement,
-      )
-    ];
+    await repository.insert(model);
   } else {
-    // update
-    final index = todoState.value.indexWhere((e) => e.id == model.id);
-    todoState.value[index] = model;
-    todoState();
+    await repository.update(model);
   }
+
+  // reload list
+  fetchTodos();
 }
 
 Future<void> deleteTodo(int id) async {
-  todoState.value = todoState.value.where((e) => e.id != id).toList();
+  final repository = injector.get<TodoRepository>();
+  await repository.delete(id);
+
+  // reload list
+  fetchTodos();
 }
