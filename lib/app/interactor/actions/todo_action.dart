@@ -11,12 +11,12 @@ Future<void> fetchTodos() async {
 
 Future<void> putTodo(TodoModel model) async {
   final repository = injector.get<TodoRepository>();
+
   if (model.id == -1) {
     await repository.insert(model);
   } else {
     await repository.update(model);
   }
-
   // reload list
   fetchTodos();
 }
@@ -24,7 +24,5 @@ Future<void> putTodo(TodoModel model) async {
 Future<void> deleteTodo(int id) async {
   final repository = injector.get<TodoRepository>();
   await repository.delete(id);
-
-  // reload list
   fetchTodos();
 }

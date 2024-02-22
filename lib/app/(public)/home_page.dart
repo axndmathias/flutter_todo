@@ -19,75 +19,81 @@ class _HomePageState extends State<HomePage> {
     fetchTodos();
   }
 
-  // Adding a new To Do
   void editTodoDialog([TodoModel? model]) {
     model ??= TodoModel(id: -1, title: '', check: false);
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Edit Todo'),
-            content: TextFormField(
-              initialValue: model?.title,
-              onChanged: (value) {
-                model = model?.copyWith(title: value);
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Todo'),
+          content: TextFormField(
+            initialValue: model?.title,
+            onChanged: (value) {
+              model = model!.copyWith(title: value);
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                deleteTodo(model!.id);
+                Navigator.pop(context);
               },
+              child: const Text('Delete'),
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  deleteTodo(model!.id);
-                  Navigator.pop(context);
-                },
-                child: const Text('Delete'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  putTodo(model!);
-                  Navigator.pop(context);
-                },
-                child: const Text('Save'),
-              )
-            ],
-          );
-        });
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                putTodo(model!);
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // RxBuilder Within the scope, all the atoms reacted automatically
-    return RxBuilder(builder: (_) {
-      final todos = todoState.value;
-      return Scaffold(
+    return RxBuilder(
+      builder: (_) {
+        final todos = todoState.value;
+        return Scaffold(
           appBar: AppBar(
             title: const Text('Home Page'),
           ),
           body: ListView.builder(
-              itemCount: todos.length,
-              itemBuilder: (_, index) {
-                final todo = todos[index];
-                return GestureDetector(
-                  onLongPress: () {
-                    editTodoDialog(todo);
+            itemCount: todos.length,
+            itemBuilder: (_, index) {
+              final todo = todos[index];
+              return GestureDetector(
+                onLongPress: () {
+                  editTodoDialog(todo);
+                },
+                child: CheckboxListTile(
+                  value: todo.check,
+                  title: Text(todo.title),
+                  onChanged: (value) {
+                    putTodo(
+                      todo.copyWith(check: value!),
+                    );
                   },
-                  child: CheckboxListTile(
-                      value: todo.check,
-                      title: Text(todo.title),
-                      onChanged: (value) {
-                        todo.copyWith(check: value);
-                      }),
-                );
-              }),
+                ),
+              );
+            },
+          ),
           floatingActionButton: FloatingActionButton(
             onPressed: editTodoDialog,
             child: const Icon(Icons.add),
-          ));
-    });
+          ),
+        );
+      },
+    );
   }
 }
