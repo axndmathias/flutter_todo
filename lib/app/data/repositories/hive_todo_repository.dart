@@ -4,7 +4,7 @@ import '../../interactor/models/todo_model.dart';
 import '../../interactor/repositories/todo_repository.dart';
 import '../adapters/todo_adapter.dart';
 
-class LocalstoreTodoRepository implements TodoRepository {
+class HiveTodoRepository implements TodoRepository {
   final db = Localstore.instance;
 
   @override
